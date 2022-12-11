@@ -1,0 +1,32 @@
+<link rel="stylesheet" href="/public/form.css" >
+<a href="/">Go to HomePage</a>
+<form method="POST" action="
+  <%= locals.book? `/edit/${locals.book._id}` : '/new' %>
+">
+  <h1>
+    <%= locals.book ? 'Edit': 'Add new' %>
+    book
+  </h1>
+  <div>
+    <label>Title</label>
+    <input required type="text" name="title" 
+      <% if(locals.book) { %>
+        value="<%= locals.book.title %>"
+      <% } %>
+    />
+  </div>
+  <div>
+    <label>Description</label>
+    <textarea cols="40" rows="5" name="description"><%= locals.book?.description%></textarea>
+  </div>
+  <div>
+    <label>Release date</label>
+    <input type="date" name="releaseDate" 
+      <% if(locals.book?.releaseDate) { %>
+        value="<%= locals.book.releaseDate.toISOString().split('T')[0] %>"
+      <% } %>
+    />
+  </div>
+  <div style="color:red"><%= locals.errMsg %></div>
+  <button type="submit">Submit</button>
+</form>

@@ -1,1 +1,20 @@
-<h1>This is the homepage</h1>
+<h1>Library</h1>
+<a href="/new">Make New title</a>
+<h2>Current titles</h2>
+<ul>
+  <% books.forEach(function (book){%>
+    <li>
+      <h3><%= book.title %></h3>
+      <p>
+        <%= book.description %>
+      </p>
+      <p>
+        <%= book.releaseDate %>
+      </p>
+      <button><a style="color:unset; text-decoration:none;" href="/edit/<%= book._id %>">Edit</a></button>
+      <button
+        onClick="fetch('/edit/<%= book._id %>', {method: 'DELETE'}).then(()=>window.location.reload())"
+      >Delete</button>
+    </li>
+  <% }); %>
+</ul>
