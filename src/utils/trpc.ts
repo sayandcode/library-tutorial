@@ -1,0 +1,36 @@
+import { AppRouter } from "@/server/routers/_app";
+import { httpBatchLink } from "@trpc/client";
+import { createTRPCNext } from "@trpc/next";
+
+function getBaseUrl(){
+  if(typeof window !== 'undefined')
+    return '';
+
+  if(process.env.VERCEL_URL)
+    return `https://${process.env.VERCEL_URL}`;
+
+  if(process.env.RENDER_INTERNAL_HOSTNAME)
+    return `https://${process.env.RENDER_INTERNAL_HOSTNAME}:${process.env.PORT}`;
+
+  return `https://localhost:${process.env.PORT ?? 3000}`
+}
+
+export const trpc = createTRPCNext<AppRouter>({
+  config(opts){
+    return {
+      links: [
+        httpBatchLink({
+          url: `${getBaseUrl()}/api/trpc`,
+
+          // you can pass any HTTP headers you wish here
+          async headers() {
+            return {
+              // authorization: getAuthCookie(),
+            }
+          }
+        }),
+      ],
+    }
+  },
+  ssr: false,
+})
