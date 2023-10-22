@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf ./dist/",
     "copy": "copyfiles",
-    "dev": "nodemon -x ts-node src/index.ts",
+    "dev": "ts-node src/index.ts",
     "build": "yarn clean && tsc",
     "start": "NODE_ENV=production node dist/index.js"
   },
