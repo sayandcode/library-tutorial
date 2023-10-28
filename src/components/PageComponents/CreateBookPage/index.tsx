@@ -1,7 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { InformationCircleIcon } from '@heroicons/react/20/solid';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Head from 'next/head'
 import Link from 'next/link';
@@ -10,17 +9,26 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 const formSchema = z.object({
   title: z.string().min(2, {message: "Book must have at least a two-character title"}),
-  description: z.string(),
-  date: z.coerce.date().max(new Date(), {message: "Date cannot be in future"}),
+  description: z.string().optional(),
+  publishDate: z.coerce.date().max(new Date(), {message: "Date cannot be in future"}),
 })
 
 type FormSchemaType = z.infer<typeof formSchema>
 
+const defaultFormValues: Partial<FormSchemaType> = {
+  title: '',
+  description: '',
+}
+
 function CreateBookPage() {
-  const {register, handleSubmit: rhfHandleSubmit, formState} = useForm<FormSchemaType>({resolver:zodResolver(formSchema)})
+  const rhfForm = useForm<FormSchemaType>({
+    resolver:zodResolver(formSchema), 
+    defaultValues: defaultFormValues
+  })
 
   const handleSubmit: SubmitHandler<FormSchemaType> = async (formData) => {
     fetch(
@@ -44,68 +52,72 @@ function CreateBookPage() {
             <CardDescription>Fill in the details for your new book</CardDescription>
           </CardHeader>
           <CardContent>
-            <form
-              className="flex flex-col gap-3"
-              onSubmit={rhfHandleSubmit(handleSubmit)}
-            >
-              <div>
-                <Label htmlFor="book-title">
-                  Title
-                </Label>
-                <div >
-                  <Input 
-                    title="Book title" 
-                    id="book-title" 
-                    {...register('title', {required: true})}
-                  />
-                  <InputErrMsg msg={formState.errors.title?.message} />
-                </div>
-              </div>
-              
+            <Form {...rhfForm}>
+              <form
+                className="flex flex-col gap-3"
+                onSubmit={rhfForm.handleSubmit(handleSubmit)}
+              >
+                <FormField
+                  control={rhfForm.control}
+                  name="title"
+                  render={({field, fieldState})=>(
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      {fieldState.error ? (
+                        <FormMessage />
+                      ): (
+                        <FormDescription>This is the name of your book</FormDescription>
+                      )}
+                    </FormItem>
+                  )}
+                />
 
-              <div>
-                <Label htmlFor="book-description" >
-                  Description
-                </Label>
-                <div >
-                  <Textarea
-                    id="book-description" 
-                    {...register('description')}
-                  />
-                  <InputErrMsg msg={formState.errors.description?.message} />
-                </div>
-              </div>
+                <FormField
+                  control={rhfForm.control}
+                  name="description"
+                  render={({field, fieldState})=>(
+                    <FormItem>
+                      <FormLabel>Description (optional)</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      {fieldState.error ? (
+                        <FormMessage />
+                      ): (
+                        <FormDescription>More info about this book</FormDescription>
+                      )}
+                    </FormItem>
+                  )}
+                />
 
-              <div>
-                <Label htmlFor="book-date" >
-                  Date of Publishing
-                </Label>
-                <div >
-                  <Input 
-                    id="book-date" 
-                    type="datetime-local" 
-                    {...register('date', {required: true})}
-                  />
-                  <InputErrMsg msg={formState.errors.date?.message} />
-                </div>
-              </div>
+                <FormField
+                  control={rhfForm.control}
+                  name="publishDate"
+                  render={({field, fieldState})=>(
+                    <FormItem>
+                      <FormLabel>Publish Date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} value={field.value?.toString() || ''} />
+                      </FormControl>
+                      {fieldState.error ? (
+                        <FormMessage />
+                      ): (
+                        <FormDescription>When this book was published</FormDescription>
+                      )}
+                    </FormItem>
+                  )}
+                />
 
-              <Button type="submit" className='w-min self-center'> Submit </Button>
-            </form>
+                <Button type="submit" className='w-min self-center'> Submit </Button>
+              </form>
+            </Form>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
-}
-
-function InputErrMsg({msg}: {msg: string|undefined}){
-  if(!msg) return null;
-  return (
-    <p className="p-1 text-sm text-red-500 flex items-center gap-x-1">
-      <InformationCircleIcon className="h-4 w-4" />
-      {msg}
-    </p>
   )
 }
 
