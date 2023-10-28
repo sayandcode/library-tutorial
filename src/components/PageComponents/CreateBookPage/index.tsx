@@ -1,3 +1,6 @@
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { InformationCircleIcon } from '@heroicons/react/20/solid';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Head from 'next/head'
@@ -5,6 +8,8 @@ import Link from 'next/link';
 import React from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 const formSchema = z.object({
   title: z.string().min(2, {message: "Book must have at least a two-character title"}),
@@ -31,60 +36,64 @@ function CreateBookPage() {
       <Head>
         <title>Add a book</title>
       </Head>
-      <div className='flex flex-col items-center mt-8'>
-        <Link href='/' className="fixed top-4 left-4 underline"> {'< Back to Home '}</Link>
-        <h1 className="text-4xl font-bold mb-4">Add a book</h1>
-        <form
-          className='p-8 bg-gray-200 rounded-lg grid grid-cols-3 gap-y-4'
-          onSubmit={rhfHandleSubmit(handleSubmit)}
-        >
-          <label className="col-span-1 flex items-center">
-            Title
-          </label>
-          <div className="col-span-2">
-            <input 
-              title="Book title" 
-              id="book-title" 
-              className="p-2 w-full"
-              {...register('title', {required: true})}
-            />
-            <InputErrMsg msg={formState.errors.title?.message} />
-          </div>
-          
+      <div className=''>
+        <Link href='/' className="m-2 block underline"> {'< Back to Home '}</Link>
+        <Card className="max-w-md w-9/12 mx-auto">
+          <CardHeader>
+            <CardTitle>Add a book</CardTitle>
+            <CardDescription>Fill in the details for your new book</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form
+              className="flex flex-col gap-3"
+              onSubmit={rhfHandleSubmit(handleSubmit)}
+            >
+              <div>
+                <Label htmlFor="book-title">
+                  Title
+                </Label>
+                <div >
+                  <Input 
+                    title="Book title" 
+                    id="book-title" 
+                    {...register('title', {required: true})}
+                  />
+                  <InputErrMsg msg={formState.errors.title?.message} />
+                </div>
+              </div>
+              
 
-          <label htmlFor="book-description" className="col-span-1 flex items-center">
-            Description
-          </label>
-          <div className="col-span-2">
-            <textarea 
-              id="book-description" 
-              className="p-2 w-full" 
-              {...register('description')}
-            />
-            <InputErrMsg msg={formState.errors.description?.message} />
-          </div>
+              <div>
+                <Label htmlFor="book-description" >
+                  Description
+                </Label>
+                <div >
+                  <Textarea
+                    id="book-description" 
+                    {...register('description')}
+                  />
+                  <InputErrMsg msg={formState.errors.description?.message} />
+                </div>
+              </div>
 
-          <label htmlFor="book-date" className="col-span-1 flex items-center">
-            Date of Publishing
-          </label>
-          <div className="col-span-2 col-start-2 ">
-            <input 
-              id="book-date" 
-              type="datetime-local" 
-              className="p-2 w-full" 
-              {...register('date', {required: true})}
-              // 
-            />
-            <InputErrMsg msg={formState.errors.date?.message} />
-          </div>
+              <div>
+                <Label htmlFor="book-date" >
+                  Date of Publishing
+                </Label>
+                <div >
+                  <Input 
+                    id="book-date" 
+                    type="datetime-local" 
+                    {...register('date', {required: true})}
+                  />
+                  <InputErrMsg msg={formState.errors.date?.message} />
+                </div>
+              </div>
 
-          <button
-            type="submit"
-            className='bg-gray-800 hover:bg-gray-600 focus-visible:bg-gray-600 outline-white text-white font-medium py-2 rounded-lg col-start-2'
-          >
-            Submit
-          </button>
-        </form>
+              <Button type="submit" className='w-min self-center'> Submit </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
@@ -93,10 +102,10 @@ function CreateBookPage() {
 function InputErrMsg({msg}: {msg: string|undefined}){
   if(!msg) return null;
   return (
-    <div className="px-1 py-2 text-sm text-red-500 flex items-center gap-x-1">
+    <p className="p-1 text-sm text-red-500 flex items-center gap-x-1">
       <InformationCircleIcon className="h-4 w-4" />
       {msg}
-    </div>
+    </p>
   )
 }
 
