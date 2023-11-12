@@ -1,6 +1,8 @@
 import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import bookTable from "./schema";
 import { z } from "zod";
+import { ErrorableAction } from "@/lib/types";
+import { tryIt } from "@/lib/utils";
 
 const bookSchema: z.ZodType<typeof bookTable.$inferInsert> = z.object({
   title: z.string().min(2, { message: "Book must have at least a two-character title" }),
@@ -14,16 +16,25 @@ const bookSchema: z.ZodType<typeof bookTable.$inferInsert> = z.object({
 
 const booksArrSchema = z.array(bookSchema)
 
-type HandlerReturnType<D = any> = {success: true, data?: D} | {success: false, msg: string};
-
-function insertBooks(db: BetterSQLite3Database, booksData: {}[]): HandlerReturnType {
+function insertBooks(db: BetterSQLite3Database, booksData: {}[]): ErrorableAction {
   const booksArrParseResult = booksArrSchema.safeParse(booksData);
   if (!booksArrParseResult.success) {
     return { success: false, msg: booksArrParseResult.error.message }
   }
-  const sqlResult = db.insert(bookTable).values(booksArrParseResult.data).run();
-  console.log("Successfully added")
-  return {success: true, data: sqlResult}
+  const sqlQueryAction = tryIt(() => db.insert(bookTable).values(booksArrParseResult.data).run())
+  if (!sqlQueryAction.success) {
+    console.log(sqlQueryAction.msg)
+    const errMsg = getErrMsgFromQueryActionMsg(sqlQueryAction.msg)
+    return { success: false, msg: errMsg }
+  }
+  return { success: true, data: sqlQueryAction.data }
 }
 
-export {insertBooks}
+function getErrMsgFromQueryActionMsg(msg:string): string{
+  switch(msg){
+    case '{"code":"SQLITE_CONSTRAINT_UNIQUE"}': return "A book with a same unique identifier exists";
+    default: return "Something went wrong while adding that table to the database"
+  }
+}
+
+export { insertBooks }
