@@ -27,10 +27,10 @@ export default function handler(
       else bookData = [parsedBody]
       const insertBooksAction = insertBooks(db, bookData)
       if(!insertBooksAction.success){
-        res.status(401).json({msg: insertBooksAction.msg})
+        res.status(400).json({msg: insertBooksAction.msg})
         return;
       }
-      res.status(200).json({msg: `Successfully created book(s) in database`})
+      res.status(201).json({msg: `Successfully created book(s) in database`})
       return;
 
     default:
