@@ -1,1 +1,1 @@
-export type ErrorableAction<D = any> = {success:true, data: D} | {success: false, msg: string}
+export type ErrorableAction<Data = any, Err = any> = {success:true, data: Data} | {success: false, err: Err}
