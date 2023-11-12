@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { cn, getIsJsonObj, tryItAsync } from '@/lib/utils'
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Loader } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import axios from 'axios';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -72,11 +72,11 @@ function CreateBookPage() {
       return;
     }
 
-    toast({ title: "Success", description: res.data.data.msg, className:"bg-green-100 text-green-600" });
-    console.log("Here")
+    toast({ title: "Success", description: res.data.data.msg, className: "bg-green-100 text-green-600" });
   }
 
   const rootErrMsg = rhfForm.formState.errors.root?.message;
+  const isSubmitting = rhfForm.formState.isSubmitting;
 
   return (
     <div>
@@ -94,92 +94,98 @@ function CreateBookPage() {
           <CardContent>
             <Form {...rhfForm}>
               <form
-                className="flex flex-col gap-3"
                 onSubmit={rhfForm.handleSubmit(handleSubmit)}
               >
-                <FormField
-                  control={rhfForm.control}
-                  name="title"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      {fieldState.error ? (
-                        <FormMessage />
-                      ) : (
-                        <FormDescription>This is the name of your book</FormDescription>
-                      )}
-                    </FormItem>
-                  )}
-                />
+                <fieldset disabled={isSubmitting} className="flex flex-col gap-3">
+                  <FormField
+                    control={rhfForm.control}
+                    name="title"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        {fieldState.error ? (
+                          <FormMessage />
+                        ) : (
+                          <FormDescription>This is the name of your book</FormDescription>
+                        )}
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={rhfForm.control}
-                  name="description"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel>Description (optional)</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} />
-                      </FormControl>
-                      {fieldState.error ? (
-                        <FormMessage />
-                      ) : (
-                        <FormDescription>More info about this book</FormDescription>
-                      )}
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={rhfForm.control}
+                    name="description"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormLabel>Description (optional)</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} />
+                        </FormControl>
+                        {fieldState.error ? (
+                          <FormMessage />
+                        ) : (
+                          <FormDescription>More info about this book</FormDescription>
+                        )}
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={rhfForm.control}
-                  name="publishDate"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel>Publish Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              className={
-                                cn("w-full flex", !field.value && "text-gray-400")
-                              }
-                            >
-                              <div className="mr-auto">
-                                {field.value?.toLocaleDateString() || 'dd/MM/YYYY'}
-                              </div>
-                              <CalendarIcon className="h-4 w-4" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger >
-                        <PopoverContent className="w-fit">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={date => date > new Date()}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      {fieldState.error ? (
-                        <FormMessage />
-                      ) : (
-                        <FormDescription>When this book was published</FormDescription>
-                      )}
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={rhfForm.control}
+                    name="publishDate"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormLabel>Publish Date</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className={
+                                  cn("w-full flex", !field.value && "text-gray-400")
+                                }
+                              >
+                                <div className="mr-auto">
+                                  {field.value?.toLocaleDateString() || 'dd/MM/YYYY'}
+                                </div>
+                                <CalendarIcon className="h-4 w-4" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger >
+                          <PopoverContent className="w-fit">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={date => date > new Date()}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        {fieldState.error ? (
+                          <FormMessage />
+                        ) : (
+                          <FormDescription>When this book was published</FormDescription>
+                        )}
+                      </FormItem>
+                    )}
+                  />
 
-                {rootErrMsg ? (
-                  <Alert className="text-red-500 bg-red-100">
-                    <AlertDescription className="leading-normal">{rootErrMsg}</AlertDescription>
-                  </Alert>
-                ) : null}
-                <Button type="submit" className='w-min self-center'> Submit </Button>
+                  {rootErrMsg ? (
+                    <Alert className="text-red-500 bg-red-100">
+                      <AlertDescription className="leading-normal">{rootErrMsg}</AlertDescription>
+                    </Alert>
+                  ) : null}
+                  <Button type="submit" className='w-min self-center' disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <Loader className="animate-spin mr-2 h-4 w-4" />
+                    ) : null}
+                    Submit
+                  </Button>
+                </fieldset>
               </form>
             </Form>
           </CardContent>
