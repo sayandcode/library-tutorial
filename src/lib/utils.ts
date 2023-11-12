@@ -10,11 +10,11 @@ export function cn(...inputs: ClassValue[]) {
  * This utility function runs the provided function inside a try-catch block, and gives an `ErrorableAction` type result
  * @param fn The function which is run inside the try-catch block
  */
-export function tryIt<ResultType = any>(fn: () => ResultType): ErrorableAction<ResultType> {
+export function tryIt<ResultType = unknown, ErrType = unknown>(fn: () => ResultType): ErrorableAction<ResultType, ErrType> {
   try {
     return { success: true, data: fn() }
   } catch (err) {
-    return { success: false, err }
+    return { success: false, err: err as ErrType }
   }
 }
 
@@ -22,11 +22,11 @@ export function tryIt<ResultType = any>(fn: () => ResultType): ErrorableAction<R
  * This utility function runs the provided async function inside a try-catch block, and gives an `ErrorableAction` type result
  * @param fn The function which is run inside the try-catch block
  */
-export async function tryItAsync<ResultType = any>(fn: () => Promise<ResultType>): Promise<ErrorableAction<ResultType>> {
+export async function tryItAsync<ResultType = unknown, ErrType = unknown>(fn: () => Promise<ResultType>): Promise<ErrorableAction<ResultType, ErrType>> {
   try {
     return { success: true, data: await fn() }
   } catch (err) {
-    return { success: false, err }
+    return { success: false, err: err as ErrType }
   }
 }
 

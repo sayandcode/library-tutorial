@@ -14,7 +14,9 @@ import { cn, getIsJsonObj, tryItAsync } from '@/lib/utils'
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import axios from 'axios';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/components/ui/use-toast';
+import { Toaster } from '@/components/ui/toaster';
 
 const formSchema = z.object({
   title: z.string().min(2, { message: "Book must have at least a two-character title" }),
@@ -30,6 +32,7 @@ const defaultFormValues: Partial<FormSchemaType> = {
 }
 
 function CreateBookPage() {
+  const { toast } = useToast();
   const rhfForm = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultFormValues
@@ -37,45 +40,51 @@ function CreateBookPage() {
 
   const handleSubmit: SubmitHandler<FormSchemaType> = async (formData) => {
     const DEFAULT_ERROR_MESSAGE = "Something went wrong when submitting the form. Please try again later";
-    const res = await tryItAsync(() => axios.post('/api/book/create', formData))
+    const res = await tryItAsync(() => axios.post<{ msg: string }>('/api/book/create', formData))
     if (!res.success) {
-      if(!axios.isAxiosError(res.err)){
-        rhfForm.setError('root', { message: DEFAULT_ERROR_MESSAGE})
-        return;
-      }
-
-      const serverResponse = res.err.response?.data.msg;
-      if(typeof serverResponse !== 'string'){
-        rhfForm.setError('root', { message: DEFAULT_ERROR_MESSAGE})
-        return;
-      }
-      
-      if(!getIsJsonObj(serverResponse)){
-        rhfForm.setError('root', { message: serverResponse})
-        return;
-      }
-
-      const parsedServerResponse = JSON.parse(serverResponse);
-      if(!Array.isArray(parsedServerResponse)) {
+      if (!axios.isAxiosError(res.err)) {
         rhfForm.setError('root', { message: DEFAULT_ERROR_MESSAGE })
         return;
       }
 
-      parsedServerResponse.forEach((issue:z.ZodIssue) =>{
+      const serverResponse = res.err.response?.data.msg;
+      if (typeof serverResponse !== 'string') {
+        rhfForm.setError('root', { message: DEFAULT_ERROR_MESSAGE })
+        return;
+      }
+
+      if (!getIsJsonObj(serverResponse)) {
+        rhfForm.setError('root', { message: serverResponse })
+        return;
+      }
+
+      const parsedServerResponse = JSON.parse(serverResponse);
+      if (!Array.isArray(parsedServerResponse)) {
+        rhfForm.setError('root', { message: DEFAULT_ERROR_MESSAGE })
+        return;
+      }
+
+      parsedServerResponse.forEach((issue: z.ZodIssue) => {
         const fieldName = mapServerFormFieldToClientFormField(issue.path[1]);
         const message = issue.message;
-        rhfForm.setError(fieldName, {message})
+        rhfForm.setError(fieldName, { message })
       })
+      return;
     }
+
+    toast({ title: "Success", description: res.data.data.msg, className:"bg-green-100 text-green-600" });
+    console.log("Here")
   }
 
-  const serverErrMsg = rhfForm.formState.errors.root?.message;
+  const rootErrMsg = rhfForm.formState.errors.root?.message;
+
   return (
     <div>
       <Head>
         <title>Add a book</title>
       </Head>
-      <div className=''>
+      <div>
+        <Toaster />
         <Link href='/' className="m-2 block underline"> {'< Back to Home '}</Link>
         <Card className="max-w-md w-9/12 mx-auto">
           <CardHeader>
@@ -165,9 +174,9 @@ function CreateBookPage() {
                   )}
                 />
 
-                {serverErrMsg ? (
+                {rootErrMsg ? (
                   <Alert className="text-red-500 bg-red-100">
-                    <AlertDescription className="leading-normal">{serverErrMsg}</AlertDescription>
+                    <AlertDescription className="leading-normal">{rootErrMsg}</AlertDescription>
                   </Alert>
                 ) : null}
                 <Button type="submit" className='w-min self-center'> Submit </Button>
@@ -180,8 +189,8 @@ function CreateBookPage() {
   )
 }
 
-function mapServerFormFieldToClientFormField(serverFieldname: any): Parameters<UseFormSetError<FormSchemaType>>[0]{
- switch(serverFieldname){
+function mapServerFormFieldToClientFormField(serverFieldname: any): Parameters<UseFormSetError<FormSchemaType>>[0] {
+  switch (serverFieldname) {
     case 'title': return 'title';
     case 'description': return 'description';
     case 'publishDate': return 'publishDate';

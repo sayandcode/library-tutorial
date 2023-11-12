@@ -1,1 +1,1 @@
-export type ErrorableAction<Data = any, Err = any> = {success:true, data: Data} | {success: false, err: Err}
+export type ErrorableAction<Data = unknown, Err = unknown> = {success:true, data: Data} | {success: false, err: Err}
