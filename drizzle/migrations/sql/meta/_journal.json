@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1699763710224,
+      "tag": "0000_dizzy_dragon_lord",
+      "breakpoints": true
+    }
+  ]
+}
