@@ -19,7 +19,6 @@ export default function handler(
 ) {
   switch(req.method){
     case 'POST': 
-      const db = makeDb();
       let bookData: {}[];
       if(Array.isArray(req.body)) bookData = req.body;
       else if (typeof req.body === 'object' && req.body !== null) bookData = [req.body]
@@ -27,6 +26,7 @@ export default function handler(
         res.status(400).json({msg: "The body should either be an object or an array of objects"})
         return;
       }
+      const db = makeDb();
       const insertBooksAction = insertBooks(db, bookData)
       if(!insertBooksAction.success){
         res.status(400).json({msg: JSON.stringify(insertBooksAction.err)})

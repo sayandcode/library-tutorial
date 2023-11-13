@@ -1,12 +1,13 @@
 import Database from "better-sqlite3";
+import type { Database as BetterSqlite3Database } from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
+let db: BetterSqlite3Database | undefined;
 
-function makeDb(){
-  const db = new Database('mySqlite.db')
-  console.log("Made new db")
+function makeDb() {
+  if(!db) db = new Database('mySqlite.db')
   return drizzle(db);
 }
 
-export type DbQueryError = {code: string, message: string};
+export type DbQueryError = { code: string, message: string };
 export default makeDb;
