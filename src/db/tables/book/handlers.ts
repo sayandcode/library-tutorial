@@ -1,7 +1,7 @@
-import bookTable from "./schema";
+import bookTable, { BookTableItem } from "./schema";
 import { z } from "zod";
 import { ErrorableAction } from "@/lib/types";
-import { tryIt } from "@/lib/utils";
+import { tryItAsync } from "@/lib/utils";
 import makeDb, { DbQueryError } from "@/db/setup";
 import { RunResult } from "better-sqlite3";
 
@@ -17,18 +17,26 @@ const bookSchema: z.ZodType<typeof bookTable.$inferInsert> = z.object({
 
 const booksArrSchema = z.array(bookSchema)
 
-function insertBooks(db: ReturnType<typeof makeDb>, booksData: {}[]): ErrorableAction<any, z.ZodIssue[]> {
+type Db = ReturnType<typeof makeDb>;
+
+async function insertBooks(db: Db, booksData: {}[]): Promise<ErrorableAction<RunResult, z.ZodIssue[]>> {
   const booksArrParseResult = booksArrSchema.safeParse(booksData);
   if (!booksArrParseResult.success) {
     console.log(booksArrParseResult.error.errors)
     return { success: false, err: booksArrParseResult.error.errors }
   }
-  const sqlQueryAction: ErrorableAction<RunResult, DbQueryError> = tryIt(() => db.insert(bookTable).values(booksArrParseResult.data).run())
+
+  const sqlQueryAction = await tryItAsync<RunResult, DbQueryError>(() => db.insert(bookTable).values(booksArrParseResult.data))
   if (!sqlQueryAction.success) {
     const err = mapDbQueryErrorToZodIssueArr(sqlQueryAction.err);
     return { success: false, err }
   }
+
   return { success: true, data: sqlQueryAction.data }
+}
+
+async function getAllBooks(db: Db): Promise<ErrorableAction<BookTableItem[], DbQueryError>> {
+  return tryItAsync<BookTableItem[], DbQueryError>(()=>db.select().from(bookTable));
 }
 
 function mapDbQueryErrorToZodIssueArr(err: DbQueryError): z.ZodIssue[] {
@@ -36,11 +44,11 @@ function mapDbQueryErrorToZodIssueArr(err: DbQueryError): z.ZodIssue[] {
     case 'SQLITE_CONSTRAINT_UNIQUE':
       const duplicatedFieldName = err.message.match(/failed: book\.(\w+)/)?.[1]
       if (!duplicatedFieldName) throw new Error('Table returned unique constraint error without specifying which field was duplicated')
-      return [{code:'custom', path: [0, duplicatedFieldName], message: 'Another entry exists with the same value for this field. This field should be unique between entries'}]
+      return [{ code: 'custom', path: [0, duplicatedFieldName], message: 'Another entry exists with the same value for this field. This field should be unique between entries' }]
 
     default:
-      throw new Error('Table returned unique constraint error without specifying which field was duplicated')
+      throw new Error('Something went wrong when interacting with the database')
   }
 }
 
-export { insertBooks }
+export { insertBooks, getAllBooks }

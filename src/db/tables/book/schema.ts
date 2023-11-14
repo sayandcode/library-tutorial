@@ -8,3 +8,4 @@ const bookTable = sqliteTable('book', {
 })
 
 export default bookTable;
+export type BookTableItem = typeof bookTable.$inferSelect;
