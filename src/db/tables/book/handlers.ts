@@ -2,8 +2,9 @@ import bookTable, { BookTableItem } from "./schema";
 import { z } from "zod";
 import { ErrorableAction } from "@/lib/types";
 import { tryItAsync } from "@/lib/utils";
-import makeDb, { DbQueryError } from "@/db/setup";
+import makeDb, { DbActionError } from "@/db/setup";
 import { RunResult } from "better-sqlite3";
+import { eq } from "drizzle-orm";
 
 const bookSchema: z.ZodType<typeof bookTable.$inferInsert> = z.object({
   title: z.string().min(2, { message: "Book must have at least a two-character title" }),
@@ -26,20 +27,26 @@ async function insertBooks(db: Db, booksData: {}[]): Promise<ErrorableAction<Run
     return { success: false, err: booksArrParseResult.error.errors }
   }
 
-  const sqlQueryAction = await tryItAsync<RunResult, DbQueryError>(() => db.insert(bookTable).values(booksArrParseResult.data))
-  if (!sqlQueryAction.success) {
-    const err = mapDbQueryErrorToZodIssueArr(sqlQueryAction.err);
+  const dbAction = await tryItAsync<RunResult, DbActionError>(() => db.insert(bookTable).values(booksArrParseResult.data))
+  if (!dbAction.success) {
+    const err = mapDbErrorToZodIssueArr(dbAction.err);
     return { success: false, err }
   }
 
-  return { success: true, data: sqlQueryAction.data }
+  return { success: true, data: dbAction.data }
 }
 
-async function getAllBooks(db: Db): Promise<ErrorableAction<BookTableItem[], DbQueryError>> {
-  return tryItAsync<BookTableItem[], DbQueryError>(()=>db.select().from(bookTable));
+async function getAllBooks(db: Db): Promise<ErrorableAction<BookTableItem[], DbActionError>> {
+  return tryItAsync<BookTableItem[], DbActionError>(()=>db.select().from(bookTable));
 }
 
-function mapDbQueryErrorToZodIssueArr(err: DbQueryError): z.ZodIssue[] {
+async function deleteBook(db: Db, bookId: number){
+  return tryItAsync(
+    () => db.delete(bookTable).where(eq(bookTable.id, bookId))
+  );
+}
+
+function mapDbErrorToZodIssueArr(err: DbActionError): z.ZodIssue[] {
   switch (err.code) {
     case 'SQLITE_CONSTRAINT_UNIQUE':
       const duplicatedFieldName = err.message.match(/failed: book\.(\w+)/)?.[1]
@@ -51,4 +58,4 @@ function mapDbQueryErrorToZodIssueArr(err: DbQueryError): z.ZodIssue[] {
   }
 }
 
-export { insertBooks, getAllBooks }
+export { insertBooks, getAllBooks, deleteBook }

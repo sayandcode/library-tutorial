@@ -9,5 +9,5 @@ function makeDb() {
   return drizzle(db);
 }
 
-export type DbQueryError = { code: string, message: string };
+export type DbActionError = { code: string, message: string };
 export default makeDb;

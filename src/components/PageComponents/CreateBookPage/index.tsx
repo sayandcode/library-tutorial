@@ -16,7 +16,6 @@ import { Calendar } from '@/components/ui/calendar';
 import axios from 'axios';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
-import { Toaster } from '@/components/ui/toaster';
 
 const formSchema = z.object({
   title: z.string().min(2, { message: "Book must have at least a two-character title" }),
@@ -84,7 +83,6 @@ function CreateBookPage() {
         <title>Add a book</title>
       </Head>
       <div>
-        <Toaster />
         <Link href='/' className="m-2 block underline"> {'< Back to Home '}</Link>
         <Card className="max-w-md w-9/12 mx-auto">
           <CardHeader>
