@@ -1,12 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { ApiRes } from '../types';
 import makeDb from '@/db/setup';
 import { getBooks, insertBooks } from '@/db/tables/book/handlers';
 
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiRes>
+  res: NextApiResponse
 ) {
   const db = makeDb();
   switch (req.method) {

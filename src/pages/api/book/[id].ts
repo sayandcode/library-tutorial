@@ -1,12 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { ApiRes } from '../types';
 import makeDb from '@/db/setup';
-import { deleteBook, getBooks } from '@/db/tables/book/handlers';
+import { deleteBook, getBooks, updateBook } from '@/db/tables/book/handlers';
 
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiRes>
+  res: NextApiResponse
 ) {
   const bookIdStr = req.query.id;
   const isBookIdValid = typeof bookIdStr === 'string' && Number.isInteger(parseFloat(bookIdStr));
@@ -31,6 +30,17 @@ export default async function handler(
         return;
       }
       res.status(200).json({data: bookDataForGetReq});
+      return;
+
+    case 'PUT': 
+      const newBookData = req.body as unknown;
+      const updateBookAction = await updateBook(db, bookId, newBookData)
+      if (!updateBookAction.success) {
+        console.error(updateBookAction.err);
+        res.status(500).json({ msg: "Could not update book. Try again later" })
+        return;
+      }
+      res.status(200).json({msg: "Updated the given book"})
       return;
 
     case 'DELETE':

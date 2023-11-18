@@ -17,6 +17,7 @@ import axios from 'axios';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
 import { format } from 'date-fns';
+import { BookTableInsertItem } from '@/db/tables/book/schema';
 
 const formSchema = z.object({
   title: z.string().min(2, { message: "Book must have at least a two-character title" }),
@@ -40,6 +41,7 @@ function CreateBookPage() {
 
   const handleSubmit: SubmitHandler<FormSchemaType> = async (formData) => {
     const DEFAULT_ERROR_MESSAGE = "Something went wrong when submitting the form. Please try again later";
+    const postData: BookTableInsertItem = {...formData, publishDate: formData.publishDate.toISOString()};
     const res = await tryItAsync(() => axios.post<{ msg: string }>('/api/book', formData))
     if (!res.success) {
       // random error, not axios

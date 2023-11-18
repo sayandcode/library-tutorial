@@ -9,3 +9,4 @@ const bookTable = sqliteTable('book', {
 
 export default bookTable;
 export type BookTableItem = typeof bookTable.$inferSelect;
+export type BookTableInsertItem = Omit<typeof bookTable.$inferInsert, 'id'>;

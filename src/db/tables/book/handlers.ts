@@ -1,4 +1,4 @@
-import bookTable, { BookTableItem } from "./schema";
+import bookTable, { BookTableInsertItem, BookTableItem } from "./schema";
 import { z } from "zod";
 import { ErrorableAction } from "@/lib/types";
 import { tryItAsync } from "@/lib/utils";
@@ -6,7 +6,7 @@ import makeDb, { DbActionError } from "@/db/setup";
 import { RunResult } from "better-sqlite3";
 import { eq, inArray } from "drizzle-orm";
 
-const bookSchema: z.ZodType<typeof bookTable.$inferInsert> = z.object({
+const bookInsertSchema = z.object({
   title: z.string().min(2, { message: "Book must have at least a two-character title" }),
   description: z.string().optional(),
   publishDate: z.string().datetime({ offset: true }).refine(dateStrVal => {
@@ -14,13 +14,13 @@ const bookSchema: z.ZodType<typeof bookTable.$inferInsert> = z.object({
     const isStrValid = isDateInPast;
     return isStrValid;
   }, 'Date cannot be in future')
-})
+}) satisfies z.ZodType<BookTableInsertItem>;
 
-const booksArrSchema = z.array(bookSchema)
+const booksArrSchema = z.array(bookInsertSchema)
 
 type Db = ReturnType<typeof makeDb>;
 
-async function insertBooks(db: Db, booksData: {}[]): Promise<ErrorableAction<RunResult, z.ZodIssue[]>> {
+export async function insertBooks(db: Db, booksData: {}[]): Promise<ErrorableAction<RunResult, z.ZodIssue[]>> {
   const booksArrParseResult = booksArrSchema.safeParse(booksData);
   if (!booksArrParseResult.success) {
     console.log(booksArrParseResult.error.errors)
@@ -29,30 +29,48 @@ async function insertBooks(db: Db, booksData: {}[]): Promise<ErrorableAction<Run
 
   const dbAction = await tryItAsync<RunResult, DbActionError>(() => db.insert(bookTable).values(booksArrParseResult.data))
   if (!dbAction.success) {
-    const err = mapDbErrorToZodIssueArr(dbAction.err);
+    const err = _mapDbErrorToZodIssueArr(dbAction.err);
     return { success: false, err }
   }
 
   return { success: true, data: dbAction.data }
 }
 
-async function getBooks(db: Db, ids?: BookTableItem['id'][]): Promise<ErrorableAction<BookTableItem[], DbActionError>> {
+export async function getBooks(db: Db, ids?: BookTableItem['id'][]): Promise<ErrorableAction<BookTableItem[], DbActionError>> {
   return tryItAsync<BookTableItem[], DbActionError>(
     () => {
       const baseQuery = db.select().from(bookTable).$dynamic();
-      if(ids) return baseQuery.where(inArray(bookTable.id, ids));
+      if (ids) return baseQuery.where(inArray(bookTable.id, ids));
       return baseQuery
     }
   );
 }
 
-async function deleteBook(db: Db, bookId: number) {
+export async function deleteBook(db: Db, bookId: number) {
   return tryItAsync(
     () => db.delete(bookTable).where(eq(bookTable.id, bookId))
   );
 }
 
-function mapDbErrorToZodIssueArr(err: DbActionError): z.ZodIssue[] {
+export async function updateBook(db: Db, bookId: number, newBookData: unknown): Promise<ErrorableAction<RunResult, z.ZodIssue[]>> {
+  const parseResult = bookInsertSchema.safeParse(newBookData);
+  if (!parseResult.success) {
+    return { success: false, err: parseResult.error.errors }
+  }
+
+  const parsedBookData = parseResult.data;
+  const dbAction = await tryItAsync<RunResult, DbActionError>(
+    () => db.update(bookTable).set(parsedBookData).where(eq(bookTable.id, bookId))
+  );
+  if (!dbAction.success) {
+    const err = _mapDbErrorToZodIssueArr(dbAction.err);
+    return { success: false, err }
+  }
+
+  return {success: true, data: dbAction.data}
+}
+
+function _mapDbErrorToZodIssueArr(err: DbActionError): z.ZodIssue[] {
   switch (err.code) {
     case 'SQLITE_CONSTRAINT_UNIQUE':
       const duplicatedFieldName = err.message.match(/failed: book\.(\w+)/)?.[1]
@@ -63,5 +81,3 @@ function mapDbErrorToZodIssueArr(err: DbActionError): z.ZodIssue[] {
       throw new Error('Something went wrong when interacting with the database')
   }
 }
-
-export { insertBooks, getBooks, deleteBook }

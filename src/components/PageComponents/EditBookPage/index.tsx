@@ -29,7 +29,6 @@ type FormSchemaType = z.infer<typeof formSchema>
 
 function EditBookPage({ bookData }: { bookData: BookTableItem }) {
   const { toast } = useToast();
-  console.log(bookData)
 
   const defaultFormValues: Partial<FormSchemaType> = {
     title: bookData.title,
@@ -44,7 +43,7 @@ function EditBookPage({ bookData }: { bookData: BookTableItem }) {
 
   const handleSubmit: SubmitHandler<FormSchemaType> = async (formData) => {
     const DEFAULT_ERROR_MESSAGE = "Something went wrong when submitting the form. Please try again later";
-    const res = await tryItAsync(() => axios.put<{ msg: string }>(`/api/book/edit/${bookData.id}`, formData))
+    const res = await tryItAsync(() => axios.put<{ msg: string }>(`/api/book/${bookData.id}`, formData))
     if (!res.success) {
       // random error, not axios
       if (!axios.isAxiosError(res.err)) {
@@ -196,7 +195,7 @@ function EditBookPage({ bookData }: { bookData: BookTableItem }) {
                     {isSubmitting ? (
                       <Loader className="animate-spin mr-2 h-4 w-4" />
                     ) : null}
-                    Save Changes
+                    Update
                   </Button>
                 </fieldset>
               </form>
