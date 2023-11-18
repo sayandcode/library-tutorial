@@ -4,7 +4,7 @@ import { ErrorableAction } from "@/lib/types";
 import { tryItAsync } from "@/lib/utils";
 import makeDb, { DbActionError } from "@/db/setup";
 import { RunResult } from "better-sqlite3";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 const bookSchema: z.ZodType<typeof bookTable.$inferInsert> = z.object({
   title: z.string().min(2, { message: "Book must have at least a two-character title" }),
@@ -36,11 +36,17 @@ async function insertBooks(db: Db, booksData: {}[]): Promise<ErrorableAction<Run
   return { success: true, data: dbAction.data }
 }
 
-async function getAllBooks(db: Db): Promise<ErrorableAction<BookTableItem[], DbActionError>> {
-  return tryItAsync<BookTableItem[], DbActionError>(()=>db.select().from(bookTable));
+async function getBooks(db: Db, ids?: BookTableItem['id'][]): Promise<ErrorableAction<BookTableItem[], DbActionError>> {
+  return tryItAsync<BookTableItem[], DbActionError>(
+    () => {
+      const baseQuery = db.select().from(bookTable).$dynamic();
+      if(ids) return baseQuery.where(inArray(bookTable.id, ids));
+      return baseQuery
+    }
+  );
 }
 
-async function deleteBook(db: Db, bookId: number){
+async function deleteBook(db: Db, bookId: number) {
   return tryItAsync(
     () => db.delete(bookTable).where(eq(bookTable.id, bookId))
   );
@@ -58,4 +64,4 @@ function mapDbErrorToZodIssueArr(err: DbActionError): z.ZodIssue[] {
   }
 }
 
-export { insertBooks, getAllBooks, deleteBook }
+export { insertBooks, getBooks, deleteBook }

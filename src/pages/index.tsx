@@ -1,6 +1,6 @@
 import HomePage from "@/components/PageComponents/HomePage";
 import makeDb from "@/db/setup";
-import { getAllBooks } from "@/db/tables/book/handlers";
+import { getBooks } from "@/db/tables/book/handlers";
 import { BookTableItem } from "@/db/tables/book/schema";
 import { tryItAsync } from "@/lib/utils";
 import { GetStaticProps } from "next";
@@ -11,7 +11,7 @@ type HomepageProps = React.ComponentProps<typeof HomePage>;
 
 export const getStaticProps: GetStaticProps<HomepageProps> = async () => {
   const db = makeDb();
-  const getAllBooksAction = await getAllBooks(db);
+  const getAllBooksAction = await getBooks(db);
   if (!getAllBooksAction.success) {
     console.error(getAllBooksAction.err);
     throw new Error("Could not fetch books for homepage");

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ApiRes } from '../types';
 import makeDb from '@/db/setup';
-import { getAllBooks } from '@/db/tables/book/handlers';
+import { getBooks } from '@/db/tables/book/handlers';
 
 
 export default async function handler(
@@ -11,7 +11,7 @@ export default async function handler(
   switch (req.method) {
     case 'GET':
       const db = makeDb();
-      const getAllBooksAction = await getAllBooks(db);
+      const getAllBooksAction = await getBooks(db);
       if (!getAllBooksAction.success) {
         console.error(getAllBooksAction.err);
         res.status(500).json({ msg: "Could not fetch books. Try again later" })
