@@ -1,6 +1,7 @@
 import HomePage from "@/components/PageComponents/HomePage";
 import makeDb from "@/db/setup";
 import { getBooks } from "@/db/tables/book/handlers";
+import { tempFn } from "@/db/temp";
 import { GetServerSideProps } from "next";
 
 const Page = HomePage;
@@ -17,5 +18,9 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({res}) =
   }
   const booksArr = getAllBooksAction.data;
   return { props: { booksArr } }
+}
+
+export const myFn = async () => {
+  return tempFn();
 }
 export default Page;
