@@ -9,17 +9,19 @@ import { tryItAsync } from "@/lib/utils";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import ClientErrors from "@/lib/errors/client";
+import Link from 'next/link';
+import { format } from "date-fns";
 
 function BookCard({ id, title, description, publishDate }: BookTableItem) {
   const router = useRouter();
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   const handleDeleteClick = useCallback(async () => {
-    const deleteReq = await tryItAsync(()=>axios.delete(`/api/book/${id}`)) ;
-    if(!deleteReq.success){
-      if(!axios.isAxiosError(deleteReq.err)){
+    const deleteReq = await tryItAsync(() => axios.delete(`/api/book/${id}`));
+    if (!deleteReq.success) {
+      if (!axios.isAxiosError(deleteReq.err)) {
         toast({
-          title: `Network Error (ERR CODE: ${ClientErrors.NetworkError})`, 
+          title: `Network Error (ERR CODE: ${ClientErrors.NetworkError})`,
           description: "Something went wrong. Please try again later",
           variant: "destructive"
         });
@@ -27,7 +29,7 @@ function BookCard({ id, title, description, publishDate }: BookTableItem) {
       }
 
       toast({
-        title: `Request Error (ERR CODE: ${ClientErrors.ApiError})`, 
+        title: `Request Error (ERR CODE: ${ClientErrors.ApiError})`,
         description: "Could not delete the book. Please try again later",
         variant: "destructive"
       });
@@ -36,9 +38,9 @@ function BookCard({ id, title, description, publishDate }: BookTableItem) {
 
     // get the new list of books
     router.reload();
-  },[id])
+  }, [id])
 
-  const formattedDate = getFormattedDate(publishDate);
+  const formattedDate = format(new Date(publishDate), 'dd/MM/yyyy');
 
   return (
     <Card className="px-4 py-3 h-full w-full group">
@@ -46,7 +48,7 @@ function BookCard({ id, title, description, publishDate }: BookTableItem) {
         <CardTitle>{title}</CardTitle>
         <div className="flex gap-x-2">
           <DeleteBtn onClick={handleDeleteClick} />
-          <EditBtn />
+          <EditBtn bookId={id} />
         </div>
       </div>
       <CardDescription>{formattedDate}</CardDescription>
@@ -57,16 +59,19 @@ function BookCard({ id, title, description, publishDate }: BookTableItem) {
   )
 }
 
-function EditBtn() {
+function EditBtn({ bookId }: { bookId: number }) {
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant="outline"
+            variant="link"
             size="icon"
+            asChild
           >
-            <PencilIcon className="w-4 h-4" />
+            <Link href={`/book/edit/${bookId}`}>
+              <PencilIcon className="w-4 h-4" />
+            </Link>
           </Button>
         </TooltipTrigger>
         <TooltipContent className="bg-white px-2 py-1 border-2 border-gray-300 rounded-md text-sm animate-in fade-in">
@@ -97,12 +102,6 @@ function DeleteBtn({ onClick: handleClick }: { onClick: DOMAttributes<HTMLButton
       </Tooltip>
     </TooltipProvider>
   )
-}
-
-function getFormattedDate(dateStr: string) {
-  const dateObj = new Date(dateStr)
-  return `${dateObj.getMonth() + 1}/${dateObj.getFullYear()}`
-
 }
 
 export default BookCard;

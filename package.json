@@ -19,6 +19,7 @@
     "better-sqlite3": "^9.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
     "drizzle-orm": "^0.29.0",
     "geist": "^1.1.0",
     "lucide-react": "^0.290.0",
