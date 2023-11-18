@@ -7,15 +7,24 @@ const Page = EditBookPage
 
 type PageProps = React.ComponentProps<typeof EditBookPage>;
 
-export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
+export const getServerSideProps: GetServerSideProps<PageProps, {id: string}> = async ({params}) => {
   const db = makeDb();
-  const bookId = [2];
-  const getAllBooksAction = await getBooks(db, bookId);
-  if (!getAllBooksAction.success) {
-    console.error(getAllBooksAction.err);
-    throw new Error("Could not fetch books for homepage");
+  const bookIdStr = params?.id;
+  const isBookIdValid = bookIdStr && Number.isInteger(parseFloat(bookIdStr));
+  if(!isBookIdValid) {
+    return { notFound: true }
   }
-  const bookData = getAllBooksAction.data[0];
+  const bookId = parseFloat(bookIdStr);
+
+  const getBooksAction = await getBooks(db, [bookId]);
+  if (!getBooksAction.success) {
+    console.error(getBooksAction.err);
+    return { notFound: true }
+  }
+  const bookData = getBooksAction.data[0];
+  if(!bookData) {
+    return { notFound: true }
+  }
   return { props: {bookData} }
 }
 

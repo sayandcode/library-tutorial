@@ -7,11 +7,12 @@ const Page = HomePage;
 
 type PageProps = React.ComponentProps<typeof HomePage>;
 
-export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
+export const getServerSideProps: GetServerSideProps<PageProps> = async ({res}) => {
   const db = makeDb();
   const getAllBooksAction = await getBooks(db);
   if (!getAllBooksAction.success) {
     console.error(getAllBooksAction.err);
+    res.statusCode = 500;
     throw new Error("Could not fetch books for homepage");
   }
   const booksArr = getAllBooksAction.data;

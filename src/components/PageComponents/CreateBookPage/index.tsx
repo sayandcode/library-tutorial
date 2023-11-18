@@ -40,7 +40,7 @@ function CreateBookPage() {
 
   const handleSubmit: SubmitHandler<FormSchemaType> = async (formData) => {
     const DEFAULT_ERROR_MESSAGE = "Something went wrong when submitting the form. Please try again later";
-    const res = await tryItAsync(() => axios.post<{ msg: string }>('/api/book/create', formData))
+    const res = await tryItAsync(() => axios.post<{ msg: string }>('/api/book', formData))
     if (!res.success) {
       // random error, not axios
       if (!axios.isAxiosError(res.err)) {
