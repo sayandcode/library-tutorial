@@ -5,7 +5,13 @@ import { Toaster } from '@/components/ui/toaster';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div className={`${GeistSans.variable} font-sans`}>
+    <div>
+      {/* This way makes sure the style is set globally i.e. also to react portals */}
+      <style jsx global>{`
+        html {
+          font-family: ${GeistSans.style.fontFamily};
+        }
+      `}</style>
       <Component {...pageProps} />
       <Toaster />
     </div>
