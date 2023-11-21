@@ -1,7 +1,7 @@
 import Page, { getServerSideProps } from "@/pages"
 import { getBooks } from "../../db/tables/book/handlers"
 import { GetServerSidePropsContext } from "next"
-import mockBooksList from "@/db/tables/book/_mock"
+import mockBooksList from "@/db/tables/book/data.mock"
 import React from "react"
 
 jest.mock("../../db/tables/book/handlers")
