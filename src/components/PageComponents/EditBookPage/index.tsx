@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { cn, getIsJsonObj, tryItAsync } from '@/lib/utils'
+import { cn, getIsJsonObjStr, tryItAsync } from '@/lib/utils'
 import { CalendarIcon, Loader } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import axios from 'axios';
@@ -59,7 +59,7 @@ function EditBookPage({ bookData }: { bookData: BookTableItem }) {
       }
 
       // general string error message
-      if (!getIsJsonObj(serverResponse)) {
+      if (!getIsJsonObjStr(serverResponse)) {
         rhfForm.setError('root', { message: serverResponse })
         return;
       }

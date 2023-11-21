@@ -33,7 +33,7 @@ export async function tryItAsync<ResultType = unknown, ErrType = unknown>(fn: ()
 /**
  * This function checks whether the provided string is a JSON stringified object or not
  */
-export function getIsJsonObj(str: string) {
+export function getIsJsonObjStr(str: string) {
   try {
     var o = JSON.parse(str);
     if (o && typeof o === "object") {
