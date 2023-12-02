@@ -10,7 +10,7 @@ export const TypographyH1 = ({
   return (
     <h1
       className={cn(
-        'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl',
+        'scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-5xl',
         className,
       )}
       {...restProps}
@@ -30,7 +30,7 @@ export const TypographyP = ({
   return (
     <p
       className={cn(
-        'leading-7 [&:not(:first-child)]:mt-6',
+        'leading-7 [&:not(:first-child)]:mt-4 lg:[&:not(:first-child)]:mt-6',
         className,
       )}
       {...restProps}

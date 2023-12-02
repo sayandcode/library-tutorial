@@ -20,7 +20,7 @@ export default function NotFound404() {
   const { path } = useLoaderData<typeof loader>();
   return (
     <div className="flex flex-col justify-center items-center h-screen">
-      <TypographyH1 className="text-5xl">Error 404</TypographyH1>
+      <TypographyH1 className="text-center px-2">Error 404</TypographyH1>
       <TypographyP className="mx-4 text-center">
         {`/${path} `}
         route doesn't exist
