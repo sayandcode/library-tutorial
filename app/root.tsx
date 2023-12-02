@@ -9,10 +9,12 @@ import {
   ScrollRestoration,
 } from '@remix-run/react';
 import twStylesheet from './tailwind.css';
+import fontsourceRedhatMonoStylesheet from '@fontsource-variable/red-hat-mono/wght.css';
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
   { rel: 'stylesheet', href: twStylesheet },
+  { rel: 'stylesheet', href: fontsourceRedhatMonoStylesheet },
 ];
 
 export default function App() {
@@ -24,7 +26,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="font-mono">
         <Outlet />
         <ScrollRestoration />
         <Scripts />
