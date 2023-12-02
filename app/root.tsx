@@ -9,7 +9,8 @@ import {
   ScrollRestoration,
 } from '@remix-run/react';
 import twStylesheet from './tailwind.css';
-import fontsourceRedhatMonoStylesheet from '@fontsource-variable/red-hat-mono/wght.css';
+import fontsourceRedhatMonoStylesheet
+  from '@fontsource-variable/red-hat-mono/wght.css';
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
