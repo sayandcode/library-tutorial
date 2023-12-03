@@ -1,5 +1,6 @@
 import { makeDb } from '~/db/setup';
 import bookTable from './schema';
+import { like } from 'drizzle-orm';
 
 type Db = ReturnType<typeof makeDb>;
 
@@ -10,11 +11,19 @@ export class BookTableHandler {
     this.db = dbInstance || makeDb();
   }
 
-  async getAll() {
-    return this.db.select({
-      id: bookTable.id,
-      title: bookTable.title,
-      description: bookTable.description,
-    }).from(bookTable);
+  async getAll(
+    { title = '' }:
+    { title?: typeof bookTable.$inferSelect.title }
+    = { title: '' },
+  ) {
+    return this
+      .db
+      .select({
+        id: bookTable.id,
+        title: bookTable.title,
+        description: bookTable.description,
+      })
+      .from(bookTable)
+      .where(like(bookTable.title, `%${title}%`));
   }
 }
