@@ -5,6 +5,7 @@ import {
   Scripts,
 } from '@remix-run/react';
 import { TypographyH1, TypographyP } from '~/components/ui/Typography';
+import Navbar from '../Navbar';
 
 export function CustomRootErrorBoundary() {
   return (
@@ -17,7 +18,8 @@ export function CustomRootErrorBoundary() {
         <Links />
       </head>
       <body className="font-mono">
-        <div className="flex flex-col justify-center items-center h-screen">
+        <Navbar />
+        <div className="flex flex-col justify-center items-center h-[90vh]">
           <TypographyH1 className="text-center px-2">Oops! This one's on us</TypographyH1>
           <TypographyP className="mx-4 text-center">
             Error 500: Something went wrong internally. Please try again later

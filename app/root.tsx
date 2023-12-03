@@ -7,10 +7,12 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from '@remix-run/react';
 import twStylesheet from './tailwind.css';
 import fontsourceRedhatMonoStylesheet from '@fontsource-variable/red-hat-mono/wght.css';
 import { CustomRootErrorBoundary } from './components/Root/ErrorBoundary';
+import Navbar from '~/components/Root/Navbar';
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
@@ -19,6 +21,7 @@ export const links: LinksFunction = () => [
 ];
 
 export default function App() {
+  const location = useLocation();
   return (
     <html lang="en">
       <head>
@@ -28,6 +31,7 @@ export default function App() {
         <Links />
       </head>
       <body className="font-mono">
+        {location.pathname === '/' ? null : <Navbar />}
         <Outlet />
         <ScrollRestoration />
         <Scripts />

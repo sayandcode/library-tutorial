@@ -19,7 +19,7 @@ export const loader = ({ params }: LoaderFunctionArgs) => {
 export default function NotFound404() {
   const { path } = useLoaderData<typeof loader>();
   return (
-    <div className="flex flex-col justify-center items-center h-screen">
+    <div className="flex flex-col justify-center items-center h-[90vh]">
       <TypographyH1 className="text-center px-2">Error 404</TypographyH1>
       <TypographyP className="mx-4 text-center">
         {`/${path} `}
