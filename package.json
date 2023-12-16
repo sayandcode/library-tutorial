@@ -12,6 +12,7 @@
   "dependencies": {
     "@fontsource-variable/red-hat-mono": "^5.0.16",
     "@radix-ui/react-collapsible": "^1.0.3",
+    "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-separator": "^1.0.3",
     "@remix-run/css-bundle": "^2.3.1",

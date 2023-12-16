@@ -1,8 +1,9 @@
 import { makeDb } from '~/db/setup';
 import bookTable from './schema';
-import { like } from 'drizzle-orm';
+import { eq, like } from 'drizzle-orm';
 
 type Db = ReturnType<typeof makeDb>;
+type BookTableSelectResult = typeof bookTable.$inferSelect;
 
 export class BookTableHandler {
   readonly db: Db;
@@ -11,11 +12,11 @@ export class BookTableHandler {
     this.db = dbInstance || makeDb();
   }
 
-  async getAll(
+  getAll = async (
     { title = '' }:
-    { title?: typeof bookTable.$inferSelect.title }
+    { title?: BookTableSelectResult['title'] }
     = { title: '' },
-  ) {
+  ): Promise<Omit<BookTableSelectResult, 'publishDate'>[]> => {
     return this
       .db
       .select({
@@ -25,5 +26,14 @@ export class BookTableHandler {
       })
       .from(bookTable)
       .where(like(bookTable.title, `%${title}%`));
-  }
+  };
+
+  getById = async (bookId: string): Promise<BookTableSelectResult> => {
+    const result = await this
+      .db
+      .select()
+      .from(bookTable)
+      .where(eq(bookTable.id, bookId));
+    return result[0];
+  };
 }

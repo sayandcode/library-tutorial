@@ -1,18 +1,12 @@
-import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { useLoaderData, Link, Form, useSubmit } from '@remix-run/react';
+import { useLoaderData, Link, Form, useSubmit, Outlet } from '@remix-run/react';
 import { SearchIcon } from 'lucide-react';
 import { TypographyH1, TypographyP } from '~/components/ui/Typography';
 import { Input } from '~/components/ui/input';
 import { ScrollArea } from '~/components/ui/scroll-area';
 import { BookTableHandler } from '~/db/tables/book/handler';
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: 'Book Catalog' },
-    { name: 'description', content: 'A list of all books' },
-  ];
-};
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const titleQuery = new URL(request.url).searchParams.get('title');
   const handler = new BookTableHandler();
@@ -64,6 +58,7 @@ export default function CatalogRoute() {
           ))}
         </ScrollArea>
       </ul>
+      <Outlet />
     </div>
   );
 }
