@@ -9,10 +9,11 @@ import { TypographyH1, TypographyP } from '~/components/ui/Typography';
 import { BookTableHandler } from '~/db/tables/book/handler';
 import type { ActionResult } from '~/lib/types/ActionResult';
 import type { z } from 'zod';
-import { useId } from 'react';
+import { useEffect, useId } from 'react';
 import { cn, sleep } from '~/lib/utils';
 import { LoaderIcon } from 'lucide-react';
 import { Textarea } from '~/components/ui/textarea';
+import { useToast } from '~/components/ui/use-toast';
 
 enum FormFields {
   title = 'title',
@@ -29,7 +30,19 @@ export const meta: MetaFunction = () => {
 
 export default function DonateIndexRoute() {
   const fetcher = useFetcher<typeof action>();
+  /* Success Handling */
+  const { toast } = useToast();
+  useEffect(() => {
+    if (fetcher.state !== 'submitting' && fetcher.data?.success) {
+      toast({
+        title: 'Added book to catalog',
+        description: 'Thank you for donating this book',
+        variant: 'success',
+      });
+    }
+  }, [toast, fetcher.state, fetcher.data?.success]);
 
+  /* Error Handling */
   const formErrors: Record<FormFields, string | null> = {
     [FormFields.title]: null,
     [FormFields.publishDate]: null,

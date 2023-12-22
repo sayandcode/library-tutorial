@@ -13,6 +13,7 @@ import twStylesheet from './tailwind.css';
 import fontsourceRedhatMonoStylesheet from '@fontsource-variable/red-hat-mono/wght.css';
 import { CustomRootErrorBoundary } from './components/Root/ErrorBoundary';
 import Navbar from '~/components/Root/Navbar';
+import { Toaster } from './components/ui/toaster';
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
@@ -33,6 +34,7 @@ export default function App() {
       <body className="font-mono">
         {location.pathname === '/' ? null : <Navbar />}
         <Outlet />
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
