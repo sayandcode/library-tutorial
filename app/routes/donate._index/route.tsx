@@ -1,4 +1,4 @@
-import { useFetcher } from '@remix-run/react';
+import { useFetcher, Link } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import type { ActionFunctionArgs } from 'react-router';
@@ -11,7 +11,7 @@ import type { ActionResult } from '~/lib/types/ActionResult';
 import type { z } from 'zod';
 import { useEffect, useId } from 'react';
 import { cn, sleep } from '~/lib/utils';
-import { LoaderIcon } from 'lucide-react';
+import { ExternalLinkIcon, LoaderIcon } from 'lucide-react';
 import { Textarea } from '~/components/ui/textarea';
 import { useToast } from '~/components/ui/use-toast';
 
@@ -34,9 +34,19 @@ export default function DonateIndexRoute() {
   const { toast } = useToast();
   useEffect(() => {
     if (fetcher.state !== 'submitting' && fetcher.data?.success) {
+      const { title, id } = fetcher.data.data;
       toast({
         title: 'Added book to catalog',
-        description: 'Thank you for donating this book',
+        description: (
+          <div>
+            Thank you for donating
+            {' '}
+            <Link to={`/catalog/${id}`} className="hover:opacity-50 inline-flex gap-x-1 items-center">
+              {title}
+              <ExternalLinkIcon aria-hidden className="h-3 w-3" />
+            </Link>
+          </div>
+        ),
         variant: 'success',
       });
     }
@@ -138,7 +148,7 @@ export default function DonateIndexRoute() {
             </div>
           </div>
           <Button className="mx-auto w-[10ch]">
-            { fetcher.state === 'submitting' ? <LoaderIcon className="animate-spin duration-1000" /> : 'Submit' }
+            { fetcher.state === 'submitting' ? <LoaderIcon aria-label="Loading Icon" className="animate-spin duration-1000" /> : 'Submit' }
           </Button>
         </fieldset>
       </fetcher.Form>
@@ -149,14 +159,13 @@ export default function DonateIndexRoute() {
 export async function action({ request }: ActionFunctionArgs) {
   await sleep(800); // add artificial delay to simulate network
   const formData = await request.formData();
-  const data = {
+  const inputFormData = {
     [FormFields.title]: formData.get(FormFields.title),
     [FormFields.publishDate]: formData.get(FormFields.publishDate),
     [FormFields.description]: formData.get(FormFields.description),
   };
-  console.log(data.publishDate);
   const bookTable = new BookTableHandler();
-  const addActionResult = await bookTable.add(data);
+  const addActionResult = await bookTable.add(inputFormData);
   if (!addActionResult.success) {
     const error = addActionResult.error.errors;
     return {
@@ -164,8 +173,8 @@ export async function action({ request }: ActionFunctionArgs) {
       error,
     } satisfies ActionResult<unknown, z.ZodIssue[]>;
   }
-  const bookData = { id: addActionResult.data.id, ...data };
-  return json({ success: true as const, data: bookData });
+
+  return json({ success: true as const, data: addActionResult.data });
 }
 
 function getIsStringAFormField(str: string): str is FormFields {

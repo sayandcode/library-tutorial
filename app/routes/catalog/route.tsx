@@ -52,13 +52,13 @@ export default function CatalogRoute() {
       >
         <div className="relative">
           <Input ref={titleRef} name="title" className="pl-10" placeholder="Search for a book by title..." defaultValue={titleQuery ?? ''} />
-          <SearchIcon className="absolute left-2 top-2 pointer-events-none" />
+          <SearchIcon aria-hidden className="absolute left-2 top-2 pointer-events-none" />
         </div>
       </Form>
       <ul className="mt-4 ">
         <ScrollArea className="relative h-screen max-h-96 lg:max-w-screen-xl mx-auto bg-gray-50 rounded">
           {isSearchingForQuery
-            ? <div className="bg-gray-400/40 w-full h-full absolute z-10 flex items-center justify-center text-white"><Loader2Icon className="h-10 w-10 animate-spin " /></div>
+            ? <div className="bg-gray-400/40 w-full h-full absolute z-10 flex items-center justify-center text-white"><Loader2Icon aria-label="Loading Icon" className="h-10 w-10 animate-spin " /></div>
             : null}
           {booksList.map(book => (
             <li key={book.id}>
@@ -77,7 +77,7 @@ export default function CatalogRoute() {
           {booksList.length === 0
             ? (
               <div className="w-full h-full absolute flex justify-center items-center flex-col px-2">
-                <LibraryBigIcon className="h-10 w-10" />
+                <LibraryBigIcon aria-hidden className="h-10 w-10" />
                 <div className="mt-2 text-center"> No books found </div>
               </div>
               )

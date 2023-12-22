@@ -44,7 +44,7 @@ export class BookTableHandler {
   };
 
   async add(bookData: unknown): Promise<
-    ActionResult<Pick<BookTableSelectType, 'id'>, z.ZodError<AddBookDesiredData>>
+    ActionResult<Pick<BookTableSelectType, 'id' | 'title'>, z.ZodError<AddBookDesiredData>>
   > {
     const bookInsertSchema: z.ZodSchema<AddBookDesiredData> = z.object({
       title: z.string().min(1),
@@ -56,19 +56,22 @@ export class BookTableHandler {
         )
         .transform(dateStr => new Date(dateStr).toISOString()),
     });
-    const parseResult = bookInsertSchema.safeParse(bookData);
-    if (!parseResult.success) {
-      return { success: false, error: parseResult.error };
+    const bookDataParseResult = bookInsertSchema.safeParse(bookData);
+    if (!bookDataParseResult.success) {
+      return { success: false, error: bookDataParseResult.error };
     }
 
     const bookId = await this.makeId();
-    const preparedBookData = { id: bookId, ...parseResult.data };
-    const result = await this
+    const preparedBookData = { id: bookId, ...bookDataParseResult.data };
+    const [addedBookData] = await this
       .db
       .insert(bookTable)
       .values(preparedBookData)
-      .returning({ id: bookTable.id });
-    return { success: true, data: { id: result[0].id } };
+      .returning({ id: bookTable.id, title: bookTable.title });
+    return {
+      success: true,
+      data: { id: addedBookData.id, title: addedBookData.title },
+    };
   }
 
   // internal methods

@@ -37,7 +37,7 @@ function MobileLinks() {
   return (
     <Collapsible className="lg:hidden">
       <CollapsibleTrigger className="flex items-center">
-        <MenuIcon />
+        <MenuIcon aria-label="Menu Icon" />
       </CollapsibleTrigger>
       <CollapsibleContent className="absolute bottom-0 left-0 translate-y-full w-full shadow-md">
         <ul className="bg-white w-full">
