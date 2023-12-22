@@ -3,7 +3,7 @@ import SiteNavLinks from './components/SiteNavLinks';
 
 export default function Navbar() {
   return (
-    <nav className="sticky top-0 bg-white z-10">
+    <nav className="sticky top-0 bg-white z-20">
       <div className="p-4 shadow-md flex justify-center items-center relative">
         <NavLink to="/" className="font-bold text-2xl order-2 lg:order-1 mx-auto lg:ml-0 lg:mr-auto">Libra</NavLink>
         <div className="order-1 lg:order-2">

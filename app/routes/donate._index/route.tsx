@@ -134,7 +134,7 @@ export default function DonateIndexRoute() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  await sleep(3000); // add artificial delay to simulate network
+  await sleep(800); // add artificial delay to simulate network
   const formData = await request.formData();
   const data = {
     [FormFields.title]: formData.get(FormFields.title),
