@@ -9,6 +9,9 @@ import { TypographyH1, TypographyP } from '~/components/ui/Typography';
 import { BookTableHandler } from '~/db/tables/book/handler';
 import type { ActionResult } from '~/lib/types/ActionResult';
 import type { z } from 'zod';
+import { useId } from 'react';
+import { cn, sleep } from '~/lib/utils';
+import { LoaderIcon } from 'lucide-react';
 
 enum FormFields {
   title = 'title',
@@ -26,6 +29,26 @@ export const meta: MetaFunction = () => {
 export default function DonateIndexRoute() {
   const fetcher = useFetcher<typeof action>();
 
+  const formErrors: Record<FormFields, string | null> = {
+    [FormFields.title]: null,
+    [FormFields.publishDate]: null,
+    [FormFields.description]: null,
+  };
+
+  if (fetcher.state !== 'submitting' && fetcher.data && !fetcher.data.success) {
+    fetcher.data.error.forEach(({ path, message }) => {
+      const erroredFieldName = path[0].toString();
+      if (!getIsStringAFormField(erroredFieldName)) return;
+      formErrors[erroredFieldName] = message;
+    });
+  }
+
+  const errorMsgElIds: Record<FormFields, string> = {
+    [FormFields.title]: useId(),
+    [FormFields.publishDate]: useId(),
+    [FormFields.description]: useId(),
+  };
+
   return (
     <div className="m-8">
       <TypographyH1>Donate a book</TypographyH1>
@@ -33,32 +56,90 @@ export default function DonateIndexRoute() {
         Libra is a not-for-profit organization.
         Every book you donate adds to the knowledge of the community
       </TypographyP>
-      <fetcher.Form method="POST" className="max-w-xl mx-auto flex flex-col gap-4">
-        <div>
-          <Label htmlFor={FormFields.title}>Book title</Label>
-          <Input name={FormFields.title} id={FormFields.title} />
-        </div>
-        <div>
-          <Label htmlFor={FormFields.publishDate}>Publish Date</Label>
-          <Input name={FormFields.publishDate} id={FormFields.publishDate} type="date" />
-        </div>
-        <div>
-          <Label htmlFor={FormFields.description}>Description</Label>
-          <Input name={FormFields.description} id={FormFields.description} />
-        </div>
-        <Button className="mx-auto">Submit</Button>
+      <fetcher.Form method="POST">
+        <fieldset
+          className="max-w-xl mx-auto flex flex-col gap-4"
+          disabled={fetcher.state === 'submitting'}
+        >
+          <div>
+            <Label
+              htmlFor={FormFields.title}
+              error={!!formErrors[FormFields.title]}
+            >
+              Book title
+            </Label>
+            <Input
+              name={FormFields.title}
+              id={FormFields.title}
+              aria-describedby={errorMsgElIds[FormFields.title]}
+              error={!!formErrors[FormFields.title]}
+            />
+            <div
+              className={cn('mt-2 mx-2 text-sm', !!formErrors[FormFields.publishDate] && 'text-rose-600')}
+              id={errorMsgElIds[FormFields.title]}
+            >
+              {formErrors[FormFields.title]}
+            </div>
+          </div>
+          <div>
+            <Label
+              htmlFor={FormFields.publishDate}
+              error={!!formErrors[FormFields.publishDate]}
+            >
+              Publish Date
+            </Label>
+            <Input
+              name={FormFields.publishDate}
+              id={FormFields.publishDate}
+              type="date"
+              aria-describedby={errorMsgElIds[FormFields.publishDate]}
+              error={!!formErrors[FormFields.publishDate]}
+            />
+            <div
+              className={cn('mt-2 mx-2 text-sm', !!formErrors[FormFields.publishDate] && 'text-rose-600')}
+              id={errorMsgElIds[FormFields.publishDate]}
+            >
+              {formErrors[FormFields.publishDate]}
+            </div>
+          </div>
+          <div>
+            <Label
+              htmlFor={FormFields.description}
+              error={!!formErrors[FormFields.description]}
+            >
+              Description
+            </Label>
+            <Input
+              name={FormFields.description}
+              id={FormFields.description}
+              aria-describedby={errorMsgElIds[FormFields.description]}
+              error={!!formErrors[FormFields.description]}
+            />
+            <div
+              className={cn('mt-2 mx-2 text-sm', !!formErrors[FormFields.description] && 'text-rose-600')}
+              id={errorMsgElIds[FormFields.description]}
+            >
+              {formErrors[FormFields.description]}
+            </div>
+          </div>
+          <Button className="mx-auto w-[10ch]">
+            { fetcher.state === 'submitting' ? <LoaderIcon className="animate-spin duration-1000" /> : 'Submit' }
+          </Button>
+        </fieldset>
       </fetcher.Form>
     </div>
   );
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await sleep(3000); // add artificial delay to simulate network
   const formData = await request.formData();
   const data = {
     [FormFields.title]: formData.get(FormFields.title),
     [FormFields.publishDate]: formData.get(FormFields.publishDate),
     [FormFields.description]: formData.get(FormFields.description),
   };
+  console.log(data.publishDate);
   const bookTable = new BookTableHandler();
   const addActionResult = await bookTable.add(data);
   if (!addActionResult.success) {
@@ -72,4 +153,6 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({ success: true as const, data: bookData });
 }
 
+function getIsStringAFormField(str: string): str is FormFields {
+  return Object.values(FormFields).includes(str as any);
 }
