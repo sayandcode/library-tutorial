@@ -6,6 +6,9 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { TypographyH1, TypographyP } from '~/components/ui/Typography';
+import { BookTableHandler } from '~/db/tables/book/handler';
+import type { ActionResult } from '~/lib/types/ActionResult';
+import type { z } from 'zod';
 
 enum FormFields {
   title = 'title',
@@ -56,6 +59,17 @@ export async function action({ request }: ActionFunctionArgs) {
     [FormFields.publishDate]: formData.get(FormFields.publishDate),
     [FormFields.description]: formData.get(FormFields.description),
   };
+  const bookTable = new BookTableHandler();
+  const addActionResult = await bookTable.add(data);
+  if (!addActionResult.success) {
+    const error = addActionResult.error.errors;
+    return {
+      success: false,
+      error,
+    } satisfies ActionResult<unknown, z.ZodIssue[]>;
+  }
+  const bookData = { id: addActionResult.data.id, ...data };
+  return json({ success: true as const, data: bookData });
+}
 
-  return json({ success: true as const, data });
 }

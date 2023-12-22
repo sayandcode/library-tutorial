@@ -9,8 +9,8 @@ import { BookTableHandler } from '~/db/tables/book/handler';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const titleQuery = new URL(request.url).searchParams.get('title');
-  const handler = new BookTableHandler();
-  const booksList = await handler.getAll({
+  const bookTable = new BookTableHandler();
+  const booksList = await bookTable.getAll({
     ...(titleQuery && { title: titleQuery }),
   });
   return json({ booksList, titleQuery });

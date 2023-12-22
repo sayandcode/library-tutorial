@@ -15,8 +15,8 @@ import { BookTableHandler } from '~/db/tables/book/handler';
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { bookId } = params;
   if (!bookId) throw new Error('This route requires a bookId as param');
-  const handler = new BookTableHandler();
-  const bookData = await handler.getById(bookId);
+  const bookTable = new BookTableHandler();
+  const bookData = await bookTable.getById(bookId);
   return json({ bookData });
 };
 
