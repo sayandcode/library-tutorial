@@ -12,6 +12,7 @@ import type { z } from 'zod';
 import { useId } from 'react';
 import { cn, sleep } from '~/lib/utils';
 import { LoaderIcon } from 'lucide-react';
+import { Textarea } from '~/components/ui/textarea';
 
 enum FormFields {
   title = 'title',
@@ -109,11 +110,12 @@ export default function DonateIndexRoute() {
             >
               Description
             </Label>
-            <Input
+            <Textarea
               name={FormFields.description}
               id={FormFields.description}
               aria-describedby={errorMsgElIds[FormFields.description]}
               error={!!formErrors[FormFields.description]}
+              defaultValue="Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis."
             />
             <div
               className={cn('mt-2 mx-2 text-sm', !!formErrors[FormFields.description] && 'text-rose-600')}

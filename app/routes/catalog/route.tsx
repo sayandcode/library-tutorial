@@ -47,7 +47,7 @@ export default function CatalogRoute() {
               <Link to={`/catalog/${book.id}`}className=" block bg-white shadow-lg m-4 lg:m-6 p-4 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="font-bold text-lg lg:text-xl">{book.title}</div>
-                  <div className="text-gray-500 text-sm lg:text-md">
+                  <div title={book.id} className="text-gray-500 text-sm lg:text-md truncate max-w-[50px]">
                     #
                     {book.id}
                   </div>

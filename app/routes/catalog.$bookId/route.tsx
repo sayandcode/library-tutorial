@@ -54,7 +54,7 @@ export default function Catalog$BookIdRoute() {
               {bookData.publishDate}
             </DialogDescription>
           </DialogHeader>
-          <div>
+          <div className="max-h-96 overflow-y-auto">
             <TypographyP>{bookData.description}</TypographyP>
           </div>
         </DialogContent>
