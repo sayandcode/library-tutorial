@@ -1,6 +1,13 @@
 import { Link } from '@remix-run/react';
 import { Button, buttonVariants } from '~/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, DialogHeader } from '~/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+  DialogHeader,
+} from '~/components/ui/dialog';
 import { cn } from '~/lib/utils';
 import lib from './lib';
 import AuthForm from './subcomponents/AuthForm';

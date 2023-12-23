@@ -14,7 +14,9 @@ const Label = React.forwardRef<
     VariantProps<typeof labelVariants> & {
       error?: boolean
     }
->(({ className, error, ...props }, ref) => (
+>(({
+  className, error, ...props
+}, ref) => (
   <LabelPrimitive.Root
     ref={ref}
     className={cn(labelVariants(), className, error && 'text-rose-400')}

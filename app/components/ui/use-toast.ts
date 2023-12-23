@@ -1,10 +1,8 @@
 // Inspired by react-hot-toast library
 import * as React from 'react';
 
-import type {
-  ToastActionElement,
-  ToastProps,
-} from '~/components/ui/toast';
+import type { ToastActionElement,
+  ToastProps } from '~/components/ui/toast';
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
@@ -63,10 +61,8 @@ const addToRemoveQueue = (toastId: string) => {
 
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId);
-    dispatch({
-      type: 'REMOVE_TOAST',
-      toastId: toastId,
-    });
+    dispatch({ type: 'REMOVE_TOAST',
+      toastId: toastId });
   }, TOAST_REMOVE_DELAY);
 
   toastTimeouts.set(toastId, timeout);
@@ -75,18 +71,14 @@ const addToRemoveQueue = (toastId: string) => {
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'ADD_TOAST':
-      return {
-        ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
-      };
+      return { ...state,
+        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT) };
 
     case 'UPDATE_TOAST':
-      return {
-        ...state,
+      return { ...state,
         toasts: state.toasts.map(t =>
           t.id === action.toast.id ? { ...t, ...action.toast } : t,
-        ),
-      };
+        ) };
 
     case 'DISMISS_TOAST': {
       const { toastId } = action;
@@ -102,29 +94,21 @@ export const reducer = (state: State, action: Action): State => {
         });
       }
 
-      return {
-        ...state,
+      return { ...state,
         toasts: state.toasts.map(t =>
           t.id === toastId || toastId === undefined
-            ? {
-                ...t,
-                open: false,
-              }
+            ? { ...t,
+                open: false }
             : t,
-        ),
-      };
+        ) };
     }
     case 'REMOVE_TOAST':
       if (action.toastId === undefined) {
-        return {
-          ...state,
-          toasts: [],
-        };
+        return { ...state,
+          toasts: [] };
       }
-      return {
-        ...state,
-        toasts: state.toasts.filter(t => t.id !== action.toastId),
-      };
+      return { ...state,
+        toasts: state.toasts.filter(t => t.id !== action.toastId) };
   }
 };
 
@@ -145,14 +129,11 @@ function toast({ ...props }: Toast) {
   const id = genId();
 
   const update = (props: ToasterToast) =>
-    dispatch({
-      type: 'UPDATE_TOAST',
-      toast: { ...props, id },
-    });
+    dispatch({ type: 'UPDATE_TOAST',
+      toast: { ...props, id } });
   const dismiss = () => dispatch({ type: 'DISMISS_TOAST', toastId: id });
 
-  dispatch({
-    type: 'ADD_TOAST',
+  dispatch({ type: 'ADD_TOAST',
     toast: {
       ...props,
       id,
@@ -160,8 +141,7 @@ function toast({ ...props }: Toast) {
       onOpenChange: (open) => {
         if (!open) dismiss();
       },
-    },
-  });
+    } });
 
   return {
     id: id,

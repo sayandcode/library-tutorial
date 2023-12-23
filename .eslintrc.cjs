@@ -15,4 +15,5 @@ rules: {
     ImportDeclaration: { minProperties: 4 },
     ExportDeclaration: { minProperties: 3 },
   }],
+  '@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
 } };

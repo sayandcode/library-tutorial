@@ -68,10 +68,8 @@ export class BookTableHandler {
       .insert(bookTable)
       .values(preparedBookData)
       .returning({ id: bookTable.id, title: bookTable.title });
-    return {
-      success: true,
-      data: { id: addedBookData.id, title: addedBookData.title },
-    };
+    return { success: true,
+      data: { id: addedBookData.id, title: addedBookData.title } };
   }
 
   // internal methods

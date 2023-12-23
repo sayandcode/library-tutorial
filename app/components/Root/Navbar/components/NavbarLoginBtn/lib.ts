@@ -31,7 +31,5 @@ function useDialogOpenHandler() {
   return [isOpen, handleOpenChange] as const;
 }
 
-export default {
-  useIsJsLoginButtonHidden,
-  useDialogOpenHandler,
-};
+export default { useIsJsLoginButtonHidden,
+  useDialogOpenHandler };

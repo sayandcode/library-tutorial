@@ -1,6 +1,8 @@
 import LoginForm from '~/components/Auth/LoginForm';
 import SignUpForm from '~/components/Auth/SignUpForm';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import {
+  Tabs, TabsContent, TabsList, TabsTrigger,
+} from '~/components/ui/tabs';
 
 enum TabOptions {
   login = 'login',

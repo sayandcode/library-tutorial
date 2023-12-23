@@ -1,8 +1,6 @@
-import {
-  Collapsible,
+import { Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
-} from '~/components/ui/collapsible';
+  CollapsibleTrigger } from '~/components/ui/collapsible';
 import { NavLink } from '@remix-run/react';
 import { MenuIcon } from 'lucide-react';
 import { Separator } from '~/components/ui/separator';

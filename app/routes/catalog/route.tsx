@@ -1,6 +1,8 @@
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { useLoaderData, Link, Form, useSubmit, Outlet, useNavigation, useLocation } from '@remix-run/react';
+import {
+  useLoaderData, Link, Form, useSubmit, Outlet, useNavigation, useLocation,
+} from '@remix-run/react';
 import { LibraryBigIcon, Loader2Icon, SearchIcon } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { TypographyH1, TypographyP } from '~/components/ui/Typography';
@@ -13,9 +15,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   await sleep(800); // add artificial delay to emulate network
   const titleQuery = new URL(request.url).searchParams.get('title');
   const bookTable = new BookTableHandler();
-  const booksList = await bookTable.getAll({
-    ...(titleQuery && { title: titleQuery }),
-  });
+  const booksList
+    = await bookTable.getAll({ ...(titleQuery && { title: titleQuery }) });
   return json({ booksList, titleQuery });
 };
 
