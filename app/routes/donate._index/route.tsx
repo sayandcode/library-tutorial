@@ -7,10 +7,10 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { TypographyH1, TypographyP } from '~/components/ui/Typography';
 import { BookTableHandler } from '~/db/tables/book/handler';
-import type { ActionResult } from '~/lib/types/ActionResult';
+import type { ActionResult } from '~/lib/types';
 import type { z } from 'zod';
-import { useEffect, useId } from 'react';
-import { cn, sleep } from '~/lib/utils';
+import { useEffect } from 'react';
+import { cn, sleep, useFormElIds } from '~/lib/utils';
 import { ExternalLinkIcon, LoaderIcon } from 'lucide-react';
 import { Textarea } from '~/components/ui/textarea';
 import { useToast } from '~/components/ui/use-toast';
@@ -20,6 +20,7 @@ enum FormFields {
   publishDate = 'publishDate',
   description = 'description',
 }
+const formFieldsArr = Object.values(FormFields);
 
 export const meta: MetaFunction = () => {
   return [
@@ -68,11 +69,7 @@ export default function DonateIndexRoute() {
     });
   }
 
-  const errorMsgElIds: Record<FormFields, string> = {
-    [FormFields.title]: useId(),
-    [FormFields.publishDate]: useId(),
-    [FormFields.description]: useId(),
-  };
+  const elIds = useFormElIds(formFieldsArr);
 
   return (
     <div className="m-8">
@@ -88,62 +85,62 @@ export default function DonateIndexRoute() {
         >
           <div>
             <Label
-              htmlFor={FormFields.title}
+              htmlFor={elIds[FormFields.title].main}
               error={!!formErrors[FormFields.title]}
             >
               Book title
             </Label>
             <Input
               name={FormFields.title}
-              id={FormFields.title}
-              aria-describedby={errorMsgElIds[FormFields.title]}
+              id={elIds[FormFields.title].main}
+              aria-describedby={elIds[FormFields.title].description}
               error={!!formErrors[FormFields.title]}
             />
             <div
               className={cn('mt-2 mx-2 text-sm', !!formErrors[FormFields.publishDate] && 'text-rose-600')}
-              id={errorMsgElIds[FormFields.title]}
+              id={elIds[FormFields.title].description}
             >
               {formErrors[FormFields.title]}
             </div>
           </div>
           <div>
             <Label
-              htmlFor={FormFields.publishDate}
+              htmlFor={elIds[FormFields.publishDate].main}
               error={!!formErrors[FormFields.publishDate]}
             >
               Publish Date
             </Label>
             <Input
               name={FormFields.publishDate}
-              id={FormFields.publishDate}
+              id={elIds[FormFields.publishDate].main}
               type="date"
-              aria-describedby={errorMsgElIds[FormFields.publishDate]}
+              aria-describedby={elIds[FormFields.publishDate].description}
               error={!!formErrors[FormFields.publishDate]}
             />
             <div
               className={cn('mt-2 mx-2 text-sm', !!formErrors[FormFields.publishDate] && 'text-rose-600')}
-              id={errorMsgElIds[FormFields.publishDate]}
+              id={elIds[FormFields.publishDate].description}
             >
               {formErrors[FormFields.publishDate]}
             </div>
           </div>
           <div>
             <Label
-              htmlFor={FormFields.description}
+              htmlFor={elIds[FormFields.description].main}
               error={!!formErrors[FormFields.description]}
             >
               Description
             </Label>
             <Textarea
               name={FormFields.description}
-              id={FormFields.description}
-              aria-describedby={errorMsgElIds[FormFields.description]}
+              id={elIds[FormFields.description].main}
+              aria-describedby={elIds[FormFields.description].description}
               error={!!formErrors[FormFields.description]}
               defaultValue="Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod. Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim. Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa duis."
             />
             <div
               className={cn('mt-2 mx-2 text-sm', !!formErrors[FormFields.description] && 'text-rose-600')}
-              id={errorMsgElIds[FormFields.description]}
+              id={elIds[FormFields.description].description}
             >
               {formErrors[FormFields.description]}
             </div>
@@ -169,10 +166,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const addActionResult = await bookTable.add(inputFormData);
   if (!addActionResult.success) {
     const error = addActionResult.error.errors;
-    return {
-      success: false,
-      error,
-    } satisfies ActionResult<unknown, z.ZodIssue[]>;
+    return { success: false,
+      error } satisfies ActionResult<unknown, z.ZodIssue[]>;
   }
 
   return json({ success: true as const, data: addActionResult.data });

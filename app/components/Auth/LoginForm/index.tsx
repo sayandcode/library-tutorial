@@ -1,15 +1,16 @@
 import { Label } from '~/components/ui/label';
 import { Input } from '~/components/ui/input';
-import { useId } from 'react';
 import { Button } from '~/components/ui/button';
+import { useFormElIds } from '~/lib/utils';
 
 enum FormFields {
   username = 'username',
   password = 'password',
 }
+const formFieldsArr = Object.values(FormFields);
 
 export default function LoginForm() {
-  const elIds = useElIds();
+  const elIds = useFormElIds(formFieldsArr);
   return (
     <form method="POST" action="/login" className="flex flex-col gap-y-2">
       <div>
@@ -23,16 +24,4 @@ export default function LoginForm() {
       <Button className="mt-2 mx-auto block">Submit</Button>
     </form>
   );
-}
-
-function useElIds() {
-  const id = useId();
-  return {
-    [FormFields.username]: {
-      main: `${id}-${FormFields.username}`,
-    },
-    [FormFields.password]: {
-      main: `${id}-${FormFields.password}`,
-    },
-  };
 }

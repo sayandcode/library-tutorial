@@ -3,7 +3,7 @@ import bookTable from './schema';
 import { eq, like } from 'drizzle-orm';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
-import type { ActionResult } from '~/lib/types/ActionResult';
+import type { ActionResult } from '~/lib/types';
 
 type Db = ReturnType<typeof makeDb>;
 type BookTableSelectType = typeof bookTable.$inferSelect;
