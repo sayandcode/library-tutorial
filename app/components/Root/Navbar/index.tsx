@@ -1,5 +1,6 @@
 import { NavLink } from '@remix-run/react';
 import SiteNavLinks from './components/SiteNavLinks';
+import NavbarLoginBtn from './components/NavbarLoginBtn';
 
 export default function Navbar() {
   return (
@@ -9,7 +10,7 @@ export default function Navbar() {
         <div className="order-1 lg:order-2">
           <SiteNavLinks />
         </div>
-        <div className="px-4 order-3" />
+        <NavbarLoginBtn className="-ml-16 lg:ml-0 lg:px-4 order-3" />
       </div>
     </nav>
   );

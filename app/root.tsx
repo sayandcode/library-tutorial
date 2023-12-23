@@ -14,6 +14,7 @@ import fontsourceRedhatMonoStylesheet from '@fontsource-variable/red-hat-mono/wg
 import { CustomRootErrorBoundary } from './components/Root/ErrorBoundary';
 import Navbar from '~/components/Root/Navbar';
 import { Toaster } from './components/ui/toaster';
+import NavbarLoginBtn from './components/Root/Navbar/components/NavbarLoginBtn';
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
@@ -32,7 +33,7 @@ export default function App() {
         <Links />
       </head>
       <body className="font-mono">
-        {location.pathname === '/' ? null : <Navbar />}
+        {location.pathname === '/' ? (<NavbarLoginBtn className="fixed top-5 right-5" />) : <Navbar />}
         <Outlet />
         <Toaster />
         <ScrollRestoration />
