@@ -3,6 +3,7 @@ import { Button, buttonVariants } from '~/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger, DialogHeader } from '~/components/ui/dialog';
 import { cn } from '~/lib/utils';
 import lib from './lib';
+import AuthForm from './subcomponents/AuthForm';
 
 export default function NavbarLoginBtn(
   { className }:
@@ -28,8 +29,8 @@ export default function NavbarLoginBtn(
               Create/Enter your account to use the app
             </DialogDescription>
           </DialogHeader>
-          <div className="max-h-96 overflow-y-auto">
-            TODO: Login form
+          <div>
+            <AuthForm />
           </div>
         </DialogContent>
       </Dialog>
