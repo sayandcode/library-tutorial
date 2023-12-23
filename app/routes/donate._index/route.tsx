@@ -1,4 +1,4 @@
-import { useFetcher, Link } from '@remix-run/react';
+import { useFetcher } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import type { ActionFunctionArgs } from 'react-router';
@@ -9,11 +9,10 @@ import { TypographyH1, TypographyP } from '~/components/ui/Typography';
 import { BookTableHandler } from '~/db/tables/book/handler';
 import type { ActionResult } from '~/lib/types';
 import type { z } from 'zod';
-import { useEffect } from 'react';
 import { cn, sleep, useFormElIds } from '~/lib/utils';
-import { ExternalLinkIcon, LoaderIcon } from 'lucide-react';
+import { LoaderIcon } from 'lucide-react';
 import { Textarea } from '~/components/ui/textarea';
-import { useToast } from '~/components/ui/use-toast';
+import lib from './lib';
 
 enum FormFields {
   title = 'title',
@@ -31,44 +30,8 @@ export const meta: MetaFunction = () => {
 
 export default function DonateIndexRoute() {
   const fetcher = useFetcher<typeof action>();
-  /* Success Handling */
-  const { toast } = useToast();
-  useEffect(() => {
-    if (fetcher.state !== 'submitting' && fetcher.data?.success) {
-      const { title, id } = fetcher.data.data;
-      toast({
-        title: 'Added book to catalog',
-        description: (
-          <div>
-            Thank you for donating
-            {' '}
-            <Link to={`/catalog/${id}`} className="hover:opacity-50 inline-flex gap-x-1 items-center">
-              {title}
-              <ExternalLinkIcon aria-hidden className="h-3 w-3" />
-            </Link>
-          </div>
-        ),
-        variant: 'success',
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toast, fetcher.state, fetcher.data?.success]);
-
-  /* Error Handling */
-  const formErrors: Record<FormFields, string | null> = {
-    [FormFields.title]: null,
-    [FormFields.publishDate]: null,
-    [FormFields.description]: null,
-  };
-
-  if (fetcher.state !== 'submitting' && fetcher.data && !fetcher.data.success) {
-    fetcher.data.error.forEach(({ path, message }) => {
-      const erroredFieldName = path[0].toString();
-      if (!getIsStringAFormField(erroredFieldName)) return;
-      formErrors[erroredFieldName] = message;
-    });
-  }
-
+  lib.useSuccessPath(fetcher);
+  const formErrors = lib.getFormErrors(formFieldsArr, fetcher);
   const elIds = useFormElIds(formFieldsArr);
 
   return (
@@ -173,6 +136,4 @@ export async function action({ request }: ActionFunctionArgs) {
   return json({ success: true as const, data: addActionResult.data });
 }
 
-function getIsStringAFormField(str: string): str is FormFields {
-  return Object.values(FormFields).includes(str as any);
-}
+export type Donate_IndexActionType = typeof action;
