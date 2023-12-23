@@ -50,6 +50,7 @@ export default function DonateIndexRoute() {
         variant: 'success',
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toast, fetcher.state, fetcher.data?.success]);
 
   /* Error Handling */
