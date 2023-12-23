@@ -36,10 +36,9 @@ function DesktopLinks() {
 
 function MobileLinks() {
   const [isOpen, setIsOpen] = useState(false);
-  const handleOpenChange = useCallback(setIsOpen, [setIsOpen]);
   const handleNavLinkClick = useCallback(() => setIsOpen(false), [setIsOpen]);
   return (
-    <Collapsible className="lg:hidden" open={isOpen} onOpenChange={handleOpenChange}>
+    <Collapsible className="lg:hidden" open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger className="flex items-center">
         <MenuIcon aria-label="Menu Icon" />
       </CollapsibleTrigger>
