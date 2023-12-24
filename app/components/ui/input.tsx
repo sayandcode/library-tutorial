@@ -27,4 +27,27 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 Input.displayName = 'Input';
 
-export { Input };
+const InputDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement> & {
+    error?: boolean
+  }
+>(({
+  className, error, ...props
+}, ref) => {
+  if (!props.children) return null;
+  return (
+    <p
+      ref={ref}
+      className={cn(
+        'text-sm text-muted-foreground m-2',
+        className,
+        error && 'text-rose-600',
+      )}
+      {...props}
+    />
+  );
+});
+InputDescription.displayName = 'FormDescription';
+
+export { Input, InputDescription };
