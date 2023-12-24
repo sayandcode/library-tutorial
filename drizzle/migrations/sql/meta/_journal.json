@@ -8,6 +8,13 @@
       "when": 1701602344613,
       "tag": "0000_silent_cassandra_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1703398957442,
+      "tag": "0001_square_nuke",
+      "breakpoints": true
     }
   ]
 }
