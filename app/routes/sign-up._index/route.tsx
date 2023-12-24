@@ -38,27 +38,34 @@ export default function LoginRoute() {
 
 export async function action({ request }: ActionFunctionArgs):
 Promise<TypedResponse<
-  ActionResult<{ [SignUpFormFields.username]: string }, z.ZodIssue[]>
->> {
+  ActionResult<
+    { [SignUpFormFields.username]: string },
+    { validationData: z.ZodIssue[]
+      formData: Record<SignUpFormFields, string | undefined> }
+>>> {
   const formData = await request.formData();
-  console.log(formData.get('username'));
   const formFields = {
-    [SignUpFormFields.username]: formData.get(SignUpFormFields.username),
-    [SignUpFormFields.password]: formData.get(SignUpFormFields.password),
+    [SignUpFormFields.username]:
+      formData.get(SignUpFormFields.username)?.toString(),
+    [SignUpFormFields.password]:
+      formData.get(SignUpFormFields.password)?.toString(),
     [SignUpFormFields.repeatPassword]:
-      formData.get(SignUpFormFields.repeatPassword),
+      formData.get(SignUpFormFields.repeatPassword)?.toString(),
   };
   if (formFields.password !== formFields.repeatPassword) {
     return json({ success: false,
-      error: [
-        { path: SignUpFormFields.repeatPassword,
+      error: { validationData: [
+        { path: [SignUpFormFields.repeatPassword],
           message: `Repeated password doesn't match` } as any as z.ZodIssue,
-      ] });
+      ],
+      formData: formFields } });
   }
   const userTable = new UserTableHandler();
   const userCreateAction = await userTable.create(formFields);
   if (!userCreateAction.success) {
-    return json({ success: false, error: userCreateAction.error.errors });
+    return json({ success: false,
+      error: { validationData: userCreateAction.error.errors,
+        formData: formFields } });
   }
 
   return json({ success: true,

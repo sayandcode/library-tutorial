@@ -32,6 +32,16 @@ Record<FieldNames, { main: string, description: string }> {
         fieldName,
         { main: `${id}-${fieldName}-main`,
           description: `${id}-${fieldName}-description` },
-      ]);
-  return Object.fromEntries(entries);
+      ] as [FieldNames, { main: string, description: string }]);
+  return getTypedObjectFromEntries(entries);
+}
+
+/**
+ * This returns a typesafe object based on the entries passed to it
+  * @param entries The array of object entries
+  */
+export function getTypedObjectFromEntries<
+  KeyName extends string, Value,
+>(entries: [KeyName, Value][]) {
+  return Object.fromEntries(entries) as Record<KeyName, Value>;
 }
